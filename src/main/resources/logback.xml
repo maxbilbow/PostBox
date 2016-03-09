@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+   <configuration scan="true">
+   <property name="configDir" value="./" />
+
+    <!-- logging to console -->
+   <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+      <layout class="ch.qos.logback.classic.PatternLayout">
+        <pattern>%d{dd-MM-yyyy HH:mm:ss} - %c [%t] %-5p - %m%n</pattern>
+      </layout>
+   </appender>
+
+    <!-- logging to system file -->
+   <appender name="system-file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>./logs/system.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>./logs/system.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>500MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{dd-MM-yyyy HH:mm:ss} - %c [%t] %-5p - %m%n</pattern>
+    </encoder>
+       <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+           <level>INFO</level>
+       </filter>
+   </appender>
+
+    <!-- logging to asn log file -->
+    <appender name="asn-log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/asn.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>./logs/asn.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>500MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{dd-MM-yyyy HH:mm:ss} - %c [%t] %-5p - %m%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+    </appender>
+
+    <logger name="uk.co.utilisoft" additivity="false">
+        <level value="DEBUG" />
+        <appender-ref ref="asn-log"/>
+        <appender-ref ref="console"/>
+    </logger>
+
+
+    <root level="WARN">
+       <appender-ref ref="console"/>
+       <appender-ref ref="system-file"/>
+   </root>
+
+ </configuration>

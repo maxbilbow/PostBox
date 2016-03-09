@@ -1,0 +1,46 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/2.6"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/2.6 http://maven.apache.org/xsd/assembly-2.6.xsd">
+    <id>package</id>
+    <formats>
+        <format>dir</format>
+        <format>zip</format>
+    </formats>
+
+    <fileSets>
+        <fileSet>
+            <directory>${basedir}/runtime</directory>
+            <outputDirectory>/</outputDirectory>
+
+        </fileSet>
+        <!-- include war/jar/exe files-->
+        <fileSet>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>${project.artifactId}-${project.version}.jar</include>
+            </includes>
+        </fileSet>
+
+    </fileSets>
+    <files>
+        <file>
+            <source>${basedir}/runtime/README.txt</source>
+            <outputDirectory>/</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>${basedir}/runtime/run.bat</source>
+            <outputDirectory>/</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+
+
+        <file>
+            <source>${basedir}/src/main/resources/application.properties</source>
+            <outputDirectory>/config</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+    </files>
+
+</assembly>
