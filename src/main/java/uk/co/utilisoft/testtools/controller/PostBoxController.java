@@ -82,7 +82,7 @@ public class PostBoxController extends AbstractView
     try
     {
       String body = aRequest.getParameter("body");
-      if (body == null)
+      if (body == null || body.isEmpty())
       {
         byte[] bytes = new byte[aRequest.getContentLength()];
 
