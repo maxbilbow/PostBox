@@ -1,4 +1,4 @@
-package uk.co.utilisoft.testtools;
+package com.maxbilbow.testtools;
 
 import click.rmx.web.Browser;
 import org.springframework.boot.SpringApplication;

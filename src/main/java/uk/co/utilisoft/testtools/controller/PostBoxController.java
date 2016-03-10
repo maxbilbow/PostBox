@@ -1,4 +1,4 @@
-package uk.co.utilisoft.testtools.controller;
+package com.maxbilbow.testtools.controller;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;

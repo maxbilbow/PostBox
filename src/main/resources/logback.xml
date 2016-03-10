@@ -43,7 +43,7 @@
         </filter>
     </appender>
 
-    <logger name="uk.co.utilisoft" additivity="false">
+    <logger name="com.maxbilbow" additivity="false">
         <level value="DEBUG" />
         <appender-ref ref="asn-log"/>
         <appender-ref ref="console"/>
