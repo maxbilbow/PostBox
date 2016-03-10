@@ -78,20 +78,32 @@ public class PostBoxController extends AbstractView
   )
   {
     FileWriter writer = null;
+    Data data;
     try
     {
-      byte[] bytes = new byte[aRequest.getContentLength()];
+      String body = aRequest.getParameter("body");
+      if (body == null)
+      {
+        byte[] bytes = new byte[aRequest.getContentLength()];
 
-      aRequest.getInputStream().read(bytes);
+        aRequest.getInputStream().read(bytes);
 
-      Data data = storeBytes(bytes);
+
+        data = storeBytes(bytes);
+        body = data.mContent;
+      }
+      else
+      {
+        data = new Data(body);
+      }
+
       mLastFileReceived.put(aAddress,data);
       mLogger.debug("File content: " + data.mContent);
 
       File file = Files.createFile(Paths.get(mOutputDirectory.getPath() + "/" + data.mFileName)).toFile();
       writer =new FileWriter(file);
-      writer.write(new String(bytes));
-      return getModelAndView(aAddress).addObject("message","Received data with size: " + bytes.length);
+      writer.write(body);
+      return getModelAndView(aAddress).addObject("message","Received data with size: " + body.length());
     } catch (Exception e)
     {
       mLogger.error("Failed to get message: " + e.getMessage());
@@ -219,18 +231,10 @@ public class PostBoxController extends AbstractView
     String mContent;
     String getForHtml()
     {
-     if (mXml)
-     {
+
        return "<xmp>" +
               mContent +
               "</xmp";
      }
-      else
-     {
-       return "<p>"+
-              mContent +
-              "</p>";
-     }
-    }
   }
 }
