@@ -166,9 +166,7 @@ public class PostBoxController extends AbstractView
                 "<h1>/" + address + "</h1>" +
                 "LAST FILE RECEIVED: " + lastReceived.mDateTime.toString(mWebDateTimeFormatter) +
                 "<br/>" +
-                "<xmp>" +
-                lastReceived.mContent +
-                "</xmp>" +
+                lastReceived.getForHtml() +
                 "</body>" +
                 "</html>";
     }
@@ -197,11 +195,16 @@ public class PostBoxController extends AbstractView
   }
 
   class Data {
+    boolean mXml = false;
     Data(String aContent)
     {
       mDateTime = DateTime.now();
       mContent = aContent;
       mFileName = "Received-"+mDateTime.toString(mFileDateTimeFormatter);
+      if (mContent.startsWith("<"))
+      {
+        mXml = true;
+      }
       if (mContent.startsWith("<?xml"))
       {
         mFileName += ".xml";
@@ -214,6 +217,20 @@ public class PostBoxController extends AbstractView
     String mFileName;
     DateTime mDateTime;
     String mContent;
-
+    String getForHtml()
+    {
+     if (mXml)
+     {
+       return "<xmp>" +
+              mContent +
+              "</xmp";
+     }
+      else
+     {
+       return "<p>"+
+              mContent +
+              "</p>";
+     }
+    }
   }
 }
