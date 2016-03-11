@@ -234,7 +234,7 @@ public class PostBoxController extends AbstractView
 
        return "<xmp>" +
               mContent +
-              "</xmp";
+              "</xmp>";
      }
   }
 }
