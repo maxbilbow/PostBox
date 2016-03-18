@@ -1,8 +1,7 @@
 package com.maxbilbow.testtools.controller;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import com.maxbilbow.testtools.service.DataReceivedService;
+import com.maxbilbow.testtools.domain.DataReceived;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -14,16 +13,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.AbstractView;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -37,27 +31,12 @@ public class PostBoxController extends AbstractView
   @Resource
   Environment mEnvironment;
 
-
-  Map<String, Data> mLastFileReceived = new HashMap<>();
-
-  DateTimeFormatter mFileDateTimeFormatter = DateTimeFormat.forPattern("yy-MM-dd-HHmmss");
-  DateTimeFormatter mWebDateTimeFormatter = DateTimeFormat.forPattern("dd/MM/yy HH:mm:ss");
+  @Resource
+  DataReceivedService mDataReceivedService;
 
   private Logger mLogger = LoggerFactory.getLogger(getClass());
 
-  private File mOutputDirectory;
 
-  @PostConstruct
-  public void init() throws IOException
-  {
-    mOutputDirectory = new File(mEnvironment.getProperty("postbox.outDir"));
-
-    if(!mOutputDirectory.exists())
-    {
-      mLogger.info("Creating new rejection folder at " + mOutputDirectory.getPath());
-      Files.createDirectories(mOutputDirectory.toPath());
-    }
-  }
 
   @RequestMapping(value = "/",method = RequestMethod.POST)
   public
@@ -78,10 +57,11 @@ public class PostBoxController extends AbstractView
   )
   {
     FileWriter writer = null;
-    Data data;
+    DataReceived data;
     try
     {
       String body = aRequest.getParameter("body");
+      String type = aRequest.getParameter("type");
       if (body == null || body.isEmpty())
       {
         byte[] bytes = new byte[aRequest.getContentLength()];
@@ -89,20 +69,17 @@ public class PostBoxController extends AbstractView
         aRequest.getInputStream().read(bytes);
 
 
-        data = storeBytes(bytes);
-        body = data.mContent;
+        data = mDataReceivedService.newDataReceived(aAddress,bytes);
+        body = data.getContent();
       }
       else
       {
-        data = new Data(body);
+        data = mDataReceivedService.newDataReceived(aAddress,body,type);
       }
 
-      mLastFileReceived.put(aAddress,data);
-      mLogger.debug("File content: " + data.mContent);
+      mLogger.debug("File content: " + data.getContent());
 
-      File file = Files.createFile(Paths.get(mOutputDirectory.getPath() + "/" + data.mFileName)).toFile();
-      writer =new FileWriter(file);
-      writer.write(body);
+
       return getModelAndView(aAddress).addObject("message","Received data with size: " + body.length());
     } catch (Exception e)
     {
@@ -133,16 +110,7 @@ public class PostBoxController extends AbstractView
     }
   }
 
-  private Data storeBytes(final byte[] aBytes)
-  {
-    String content = new String(aBytes);
-    if (content.isEmpty())
-    {
-      throw new RuntimeException(content);
-    }
-    mLogger.debug(content);
-    return new Data(content);
-  }
+
 
   @RequestMapping(value = "/", method = RequestMethod.GET)
   public ModelAndView get(final HttpServletRequest aRequest,
@@ -163,7 +131,7 @@ public class PostBoxController extends AbstractView
   }
 
 
-  String getPageBody(String aTitle, Data aLastReceived)
+  String getPageBody(String aTitle, DataReceived aLastReceived)
   {
     final String content;
     if (aLastReceived == null)
@@ -175,10 +143,10 @@ public class PostBoxController extends AbstractView
     else
     {
       content = "\n      <p>" +
-                "\n        LAST FILE RECEIVED: " + aLastReceived.mDateTime.toString(mWebDateTimeFormatter) +
+                "\n        LAST FILE RECEIVED: " + aLastReceived.getFileName() +
                 "\n      </p>" +
                 "\n      <xmp>" +
-                "\n" +  aLastReceived.mContent +
+                "\n" +  aLastReceived.getContent() +
                 "\n      </xmp>";
     }
     return "<html>" +
@@ -196,32 +164,10 @@ public class PostBoxController extends AbstractView
   {
     String message;
     String address = (String) aMap.get("address");//(String) aHttpServletRequest.getAttribute("address");
-    Data lastReceived = mLastFileReceived.get(address);
+    DataReceived lastReceived = mDataReceivedService.getLastFileForAddress(address);
 
     message = getPageBody(address,lastReceived);
-//    if (lastReceived != null)
-//    {
-//      message = "<html>" +
-//                "\r\n<body>" +
-//                "\r\n<h1>/" + address + "</h1>" +
-//                "LAST FILE RECEIVED: " + lastReceived.mDateTime.toString(mWebDateTimeFormatter) +
-//                "<br/>" +
-//                lastReceived.getForHtml() +
-//                "</body>" +
-//                "</html>";
-//    }
-//    else
-//    {
-//      message = "<html>" +
-//                "<body>" +
-//                "<h1>/"+address+"</h1>" +
-//                "No files received. Direct posts to: " +
-//                "<br/>http://localhost:"+mEnvironment.getProperty("server.port")+"/{id)" +
-//                "<br/> where {id} is the unique url you want to test" +
-//                "</body>" +
-//                "</html>";
-//    }
-//    aHttpServletResponse.setHeader("Content-Disposition", "attachment; filename="+aFileName);
+
     aHttpServletResponse.setContentType("text/html");
     aHttpServletResponse.getWriter().write(message);
   }
@@ -234,36 +180,4 @@ public class PostBoxController extends AbstractView
     return mav;
   }
 
-  class Data {
-    boolean mXml = false;
-    Data(String aContent)
-    {
-      mDateTime = DateTime.now();
-      mContent = aContent;
-      mFileName = "Received-"+mDateTime.toString(mFileDateTimeFormatter);
-      if (mContent.startsWith("<"))
-      {
-        mXml = true;
-      }
-      if (mContent.startsWith("<?xml"))
-      {
-        mFileName += ".xml";
-      }
-      else
-      {
-        mFileName += ".txt";
-      }
-    }
-    String mFileName;
-    DateTime mDateTime;
-    String mContent;
-    String getForHtml()
-    {
-
-       return "\n<xmp>" +
-              "\n" +
-              mContent +
-              "\n</xmp>";
-     }
-  }
 }
