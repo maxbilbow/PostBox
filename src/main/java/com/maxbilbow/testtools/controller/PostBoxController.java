@@ -162,6 +162,33 @@ public class PostBoxController extends AbstractView
    return getModelAndView(aAddress);//.addObject("address",aAddress);
   }
 
+
+  String getPageBody(String aTitle, Data aLastReceived)
+  {
+    final String content;
+    if (aLastReceived == null)
+    {
+      content = "\n      No files received. Direct posts to: " +
+                "\n      <br/>http://localhost:" + mEnvironment.getProperty("server.port") + "/{id)" +
+                "\n      <br/> where {id} is the unique url you want to test";
+    }
+    else
+    {
+      content = "\n      <p>" +
+                "\n        LAST FILE RECEIVED: " + aLastReceived.mDateTime.toString(mWebDateTimeFormatter) +
+                "\n      </p>" +
+                "\n      <xmp>" +
+                "\n" +  aLastReceived.mContent +
+                "\n      </xmp>";
+    }
+    return "<html>" +
+           "\n  <body>" +
+           "\n    <h1>/" + aTitle + "</h1>" +
+           content +
+           "\n  </body>" +
+           "\n</html>";
+  }
+
   @Override
   protected void renderMergedOutputModel(final Map<String, Object> aMap,
                                          final HttpServletRequest aHttpServletRequest,
@@ -171,28 +198,29 @@ public class PostBoxController extends AbstractView
     String address = (String) aMap.get("address");//(String) aHttpServletRequest.getAttribute("address");
     Data lastReceived = mLastFileReceived.get(address);
 
-    if (lastReceived != null)
-    {
-      message = "<html>" +
-                "<body>" +
-                "<h1>/" + address + "</h1>" +
-                "LAST FILE RECEIVED: " + lastReceived.mDateTime.toString(mWebDateTimeFormatter) +
-                "<br/>" +
-                lastReceived.getForHtml() +
-                "</body>" +
-                "</html>";
-    }
-    else
-    {
-      message = "<html>" +
-                "<body>" +
-                "<h1>/"+address+"</h1>" +
-                "No files received. Direct posts to: " +
-                "<br/>http://localhost:"+mEnvironment.getProperty("server.port")+"/{id)" +
-                "<br/> where {id} is the unique url you want to test" +
-                "</body>" +
-                "</html>";
-    }
+    message = getPageBody(address,lastReceived);
+//    if (lastReceived != null)
+//    {
+//      message = "<html>" +
+//                "\r\n<body>" +
+//                "\r\n<h1>/" + address + "</h1>" +
+//                "LAST FILE RECEIVED: " + lastReceived.mDateTime.toString(mWebDateTimeFormatter) +
+//                "<br/>" +
+//                lastReceived.getForHtml() +
+//                "</body>" +
+//                "</html>";
+//    }
+//    else
+//    {
+//      message = "<html>" +
+//                "<body>" +
+//                "<h1>/"+address+"</h1>" +
+//                "No files received. Direct posts to: " +
+//                "<br/>http://localhost:"+mEnvironment.getProperty("server.port")+"/{id)" +
+//                "<br/> where {id} is the unique url you want to test" +
+//                "</body>" +
+//                "</html>";
+//    }
 //    aHttpServletResponse.setHeader("Content-Disposition", "attachment; filename="+aFileName);
     aHttpServletResponse.setContentType("text/html");
     aHttpServletResponse.getWriter().write(message);
@@ -232,9 +260,10 @@ public class PostBoxController extends AbstractView
     String getForHtml()
     {
 
-       return "<xmp>" +
+       return "\n<xmp>" +
+              "\n" +
               mContent +
-              "</xmp>";
+              "\n</xmp>";
      }
   }
 }
