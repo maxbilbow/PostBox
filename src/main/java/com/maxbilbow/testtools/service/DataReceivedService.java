@@ -49,4 +49,9 @@ public class DataReceivedService
     }
     return newDataReceived(aAddress,content,null);
   }
+
+  public List<DataReceived> getDataWithAddress(final String aAddress)
+  {
+    return mTransactionTemplate.execute(status -> mDataReceivedDao.findWithAddress(aAddress));
+  }
 }

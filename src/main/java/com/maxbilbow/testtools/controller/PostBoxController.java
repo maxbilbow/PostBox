@@ -1,7 +1,7 @@
 package com.maxbilbow.testtools.controller;
 
-import com.maxbilbow.testtools.service.DataReceivedService;
 import com.maxbilbow.testtools.domain.DataReceived;
+import com.maxbilbow.testtools.service.DataReceivedService;
 import com.maxbilbow.testtools.util.PBFileWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,21 +12,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.AbstractView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * Created by bilbowm (Max Bilbow) on 09/03/2016.
  */
 @Controller
 @RequestMapping
-public class PostBoxController extends AbstractView
+public class PostBoxController// extends AbstractView
 {
 
   @Resource
@@ -45,7 +43,7 @@ public class PostBoxController extends AbstractView
   @RequestMapping(value = "/",method = RequestMethod.POST)
   public
   @ResponseBody
-  ModelAndView post(HttpServletRequest aRequest,
+  String post(HttpServletRequest aRequest,
                        HttpServletResponse aResponse)
   {
     return post(aRequest,aResponse,"index");
@@ -55,7 +53,7 @@ public class PostBoxController extends AbstractView
   @RequestMapping(value = "/{address}", method = RequestMethod.POST)
   public
   @ResponseBody
-  ModelAndView post(HttpServletRequest aRequest,
+  String post(HttpServletRequest aRequest,
                        HttpServletResponse aResponse,
                        @PathVariable("address") String aAddress
   )
@@ -73,7 +71,7 @@ public class PostBoxController extends AbstractView
         aRequest.getInputStream().read(bytes);
 
         data = mDataReceivedService.newDataReceived(aAddress,bytes);
-        body = data.getContent();
+//        body = data.getContent();
       }
       else
       {
@@ -84,7 +82,7 @@ public class PostBoxController extends AbstractView
       mLogger.debug("Creating file with content: " + data.getContent());
       mFileWriter.createFile(data);
 
-      return getModelAndView(aAddress).addObject("message","Received data with size: " + body.length());
+      return getPageBody(aAddress,data); //getModelAndView(aAddress).addObject("message","Received data with size: " + body.length());
     } catch (Exception e)
     {
       mLogger.error("Failed to get message: " + e.getMessage());
@@ -114,28 +112,23 @@ public class PostBoxController extends AbstractView
     }
   }
 
-
-
-  @RequestMapping(value = "/", method = RequestMethod.GET)
-  public ModelAndView get(final HttpServletRequest aRequest,
-                            final HttpServletResponse aResponse)
-  {
-    return get(aRequest,aResponse,"index");
-    }
-
   @RequestMapping(value = "/{address}", method = RequestMethod.GET)
-  public ModelAndView get(
-          final HttpServletRequest aRequest,
-          final HttpServletResponse aResponse,
-          @PathVariable("address") String aAddress)
+  public ModelAndView getModelAndView(@PathVariable("address") String aAddress)
   {
-
-//   aRequest.getSession().setAttribute("address", aAddress);
-   return getModelAndView(aAddress);//.addObject("address",aAddress);
+    return new ModelAndView("postbox")
+            .addObject("dataList",mDataReceivedService.getDataWithAddress(aAddress))
+            .addObject("pageTitle",aAddress)
+            .addObject("serverPort",mEnvironment.getProperty("server.port"));
   }
 
+  @RequestMapping(value = "/", method = RequestMethod.GET)
+  public ModelAndView get()
+  {
+    return getModelAndView("index");
+  }
 
-  String getPageBody(String aTitle, DataReceived aLastReceived)
+  @Deprecated
+  private String getPageBody(String aTitle, DataReceived aLastReceived)
   {
     final String content;
     if (aLastReceived == null)
@@ -160,28 +153,4 @@ public class PostBoxController extends AbstractView
            "\n  </body>" +
            "\n</html>";
   }
-
-  @Override
-  protected void renderMergedOutputModel(final Map<String, Object> aMap,
-                                         final HttpServletRequest aHttpServletRequest,
-                                         final HttpServletResponse aHttpServletResponse) throws Exception
-  {
-    String message;
-    String address = (String) aMap.get("address");//(String) aHttpServletRequest.getAttribute("address");
-    DataReceived lastReceived = mDataReceivedService.getLastFileForAddress(address);
-
-    message = getPageBody(address,lastReceived);
-
-    aHttpServletResponse.setContentType("text/html");
-    aHttpServletResponse.getWriter().write(message);
-  }
-
-  public ModelAndView getModelAndView(String aAddress)
-  {
-    getAttributesMap().put("address", aAddress);
-    ModelAndView mav = new ModelAndView();
-    mav.setView(this);
-    return mav;
-  }
-
 }
