@@ -68,7 +68,6 @@ public class PostBoxController extends AbstractView
 
         aRequest.getInputStream().read(bytes);
 
-
         data = mDataReceivedService.newDataReceived(aAddress,bytes);
         body = data.getContent();
       }

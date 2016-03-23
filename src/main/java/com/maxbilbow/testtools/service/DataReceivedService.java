@@ -18,7 +18,6 @@ public class DataReceivedService
 {
   Map<String, DataReceived> mLastFileReceived = new HashMap<>();
 
-
   Logger mLogger = LoggerFactory.getLogger(getClass());
 
   @Resource
