@@ -1,14 +1,15 @@
 package com.maxbilbow.testtools.service;
 
+import com.maxbilbow.testtools.dao.DataReceivedDao;
 import com.maxbilbow.testtools.domain.DataReceived;
-import com.maxbilbow.testtools.util.PBFileWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.Map;
+import javax.transaction.Transactional;
+import java.util.List;
 
 /**
  * Created by bilbowm (Max Bilbow) on 18/03/2016.
@@ -16,23 +17,26 @@ import java.util.Map;
 @Service
 public class DataReceivedService
 {
-  Map<String, DataReceived> mLastFileReceived = new HashMap<>();
 
   Logger mLogger = LoggerFactory.getLogger(getClass());
 
   @Resource
-  private PBFileWriter mFileWriter;
+  private DataReceivedDao mDataReceivedDao;
+
+  @Resource
+  private TransactionTemplate mTransactionTemplate;
 
   public DataReceived getLastFileForAddress(String aAddress)
   {
-    return mLastFileReceived.get(aAddress);
+    final List<DataReceived> data = mTransactionTemplate.execute(status -> mDataReceivedDao.findWithAddress(aAddress));
+    return data.isEmpty() ? null : data.get(0);
   }
 
+  @Transactional
   public DataReceived newDataReceived(String aAddress, String aContent, String aType)
   {
-    DataReceived data = new DataReceived(aContent,aType);
-    mLastFileReceived.put(aAddress,data);
-    mFileWriter.createFile(data);
+    DataReceived data = new DataReceived(aContent,aType,aAddress);
+    mTransactionTemplate.execute(status -> mDataReceivedDao.makePersistent(data));
     return data;
   }
 

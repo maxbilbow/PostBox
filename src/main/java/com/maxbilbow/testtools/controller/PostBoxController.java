@@ -2,6 +2,7 @@ package com.maxbilbow.testtools.controller;
 
 import com.maxbilbow.testtools.service.DataReceivedService;
 import com.maxbilbow.testtools.domain.DataReceived;
+import com.maxbilbow.testtools.util.PBFileWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -27,6 +28,9 @@ import java.util.Map;
 @RequestMapping
 public class PostBoxController extends AbstractView
 {
+
+  @Resource
+  private PBFileWriter mFileWriter;
 
   @Resource
   Environment mEnvironment;
@@ -76,8 +80,9 @@ public class PostBoxController extends AbstractView
         data = mDataReceivedService.newDataReceived(aAddress,body,type);
       }
 
-      mLogger.debug("File content: " + data.getContent());
 
+      mLogger.debug("Creating file with content: " + data.getContent());
+      mFileWriter.createFile(data);
 
       return getModelAndView(aAddress).addObject("message","Received data with size: " + body.length());
     } catch (Exception e)
