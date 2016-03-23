@@ -22,14 +22,14 @@ public class DeleteDataController
   public Object deleteAll()
   {
     mLogger.warn("DELETING ALL DATA");
-    return false;
+    return mDataReceivedService.deleteAll()!= null;
   }
 
   @RequestMapping(value = "/{address}" ,params = "delete", method = RequestMethod.GET)
   public Object deleteAllFromAddress(@PathVariable("address")String aAddress)
   {
     mLogger.warn("DELETING ALL DATA FOR /"+aAddress);
-    return false;
+    return mDataReceivedService.deleteAllWithAddress(aAddress)!= null;
   }
 
   @RequestMapping(value = "/", params = {"delete","pk"},method = RequestMethod.GET)

@@ -67,4 +67,18 @@ public class DataReceivedService
 
     return  mTransactionTemplate.execute(status -> mDataReceivedDao.makeTransient(data));
   }
+
+  @Transactional
+  public List<DataReceived> deleteAll()
+  {
+    final List<DataReceived> dataList = findAll();
+    return mTransactionTemplate.execute(status -> mDataReceivedDao.batchMakeTransient(dataList));
+  }
+
+  @Transactional
+  public List<DataReceived>  deleteAllWithAddress(final String aAddress)
+  {
+    final List<DataReceived> dataList = getDataWithAddress(aAddress);
+    return mTransactionTemplate.execute(status -> mDataReceivedDao.batchMakeTransient(dataList));
+  }
 }
