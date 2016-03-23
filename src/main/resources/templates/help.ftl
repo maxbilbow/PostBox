@@ -44,7 +44,7 @@
 </div>
 
 <div class="message-warn">
-  <span id="delete-all-data" data-address="" class="btn btn-warning">DELETE ALL DATA</span>
+  <span id="delete-all-data" data-address="${postPath}" class="btn btn-warning">DELETE ALL DATA</span>
 </div>
 <script lang="text/javascript" src="/js/custom.js"></script>
 </body>

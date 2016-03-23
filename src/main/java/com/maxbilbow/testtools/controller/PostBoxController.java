@@ -128,17 +128,23 @@ public class PostBoxController// extends AbstractView
     return new ModelAndView("postbox")
             .addObject("dataList",mDataReceivedService.getDataWithAddress(aAddress))
             .addObject("pageTitle",aAddress)
+            .addObject("postPath",aAddress)
             .addObject("serverPort",mEnvironment.getProperty("server.port"));
   }
 
-  @RequestMapping(value = {"/"}, method = RequestMethod.GET)
+  @RequestMapping(value = {"/","PostBoxHelp"}, method = RequestMethod.GET)
   public ModelAndView getHelp(String aAddress)
   {
+    if (aAddress == null || aAddress.isEmpty())
+    {
+      aAddress = "PostBox";
+    }
     Set<String> urls = new HashSet<>();
     mDataReceivedService.findAll().forEach(aDataReceived -> urls.add(aDataReceived.getAddress()));
     return new ModelAndView("help")
             .addObject("urls", new ArrayList<>(urls))
             .addObject("pageTitle",aAddress + " (help)")
+            .addObject("postPath",aAddress)
             .addObject("serverPort",mEnvironment.getProperty("server.port"));
   }
 

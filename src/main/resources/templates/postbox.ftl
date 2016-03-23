@@ -30,11 +30,11 @@
         <h4>${n+1} / ${dataList?size} Received</h4>
         <div>
 
-            <#if n != 0><a href="/${pageTitle}?n=${n-1}"></#if>
+            <#if n != 0><a href="/${postPath}?n=${n-1}"></#if>
             << last
             <#if n != 0></a></#if>
             ||
-            <#if dataList[n+1]?has_content><a href="/${pageTitle}?n=${n+1}"></#if>
+            <#if dataList[n+1]?has_content><a href="/${postPath}?n=${n+1}"></#if>
                     next >>
             <#if dataList[n+1]?has_content></a></#if>
         </div>
@@ -47,8 +47,8 @@
         <xmp>${data.content}</xmp>
         </div>
         <div class="message-warn">
-            <span id="delete-one" data-pk="${data.pk?c}" data-address="${pageTitle}" class="btn btn-warning">DELETE THIS ENTRY</span>
-            <span id="delete-all-data" class="btn btn-danger" data-address="${pageTitle}">DELETE ALL FOR PATH</span>
+            <span id="delete-one" data-pk="${data.pk?c}" data-address="${postPath}" class="btn btn-warning">DELETE THIS ENTRY</span>
+            <span id="delete-all-data" class="btn btn-danger" data-address="${postPath}">DELETE ALL FOR PATH</span>
         </div>
     <#else>
     <p>No files received. Direct posts to:
