@@ -71,4 +71,11 @@ public class GenericDao<T extends GenericDomain<? extends Number>>
     }
     return aGenericDomains;
   }
+
+  public <T> T findByPk(final Long aPk)
+  {
+    return (T) getSession().createQuery("FROM " + getClassName() + " WHERE pk = :pk")
+            .setLong("pk",aPk)
+            .uniqueResult();
+  }
 }

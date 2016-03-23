@@ -7,10 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
@@ -86,7 +83,7 @@ public class PostBoxController// extends AbstractView
       mLogger.debug("Creating file with content: " + data.getContent());
       mFileWriter.createFile(data);
 
-      return getPageBody(aAddress,data); //getModelAndView(aAddress).addObject("message","Received data with size: " + body.length());
+      return data.getContent();//getModelAndView(aAddress).addObject("message","Received data with size: " + body.length());
     } catch (Exception e)
     {
       mLogger.error("Failed to get message: " + e.getMessage());
@@ -116,7 +113,7 @@ public class PostBoxController// extends AbstractView
     }
   }
 
-  @RequestMapping(value = "/data/{address}", method = RequestMethod.GET)
+  @RequestMapping(value = "/{address}", method = RequestMethod.GET)
   public ModelAndView getModelAndView(@PathVariable("address") String aAddress)
   {
     if (aAddress == null || aAddress.isEmpty())
@@ -126,7 +123,7 @@ public class PostBoxController// extends AbstractView
     List dataList = mDataReceivedService.getDataWithAddress(aAddress);
     if (dataList.isEmpty() || aAddress.equalsIgnoreCase("PostBoxHelp"))
     {
-      return getHelp();
+      return getHelp(aAddress);
     }
     return new ModelAndView("postbox")
             .addObject("dataList",mDataReceivedService.getDataWithAddress(aAddress))
@@ -134,45 +131,45 @@ public class PostBoxController// extends AbstractView
             .addObject("serverPort",mEnvironment.getProperty("server.port"));
   }
 
-  @RequestMapping(value = {"/","/data"}, method = RequestMethod.GET)
-  public ModelAndView getHelp()
+  @RequestMapping(value = {"/"}, method = RequestMethod.GET)
+  public ModelAndView getHelp(String aAddress)
   {
     Set<String> urls = new HashSet<>();
     mDataReceivedService.findAll().forEach(aDataReceived -> urls.add(aDataReceived.getAddress()));
     return new ModelAndView("help")
             .addObject("urls", new ArrayList<>(urls))
-            .addObject("pageTitle","PostBoxHelp")
+            .addObject("pageTitle",aAddress + " (help)")
             .addObject("serverPort",mEnvironment.getProperty("server.port"));
   }
 
 
 
-  @Deprecated
-  private String getPageBody(String aTitle, DataReceived aLastReceived)
-  {
-    final String content;
-    if (aLastReceived == null)
-    {
-      content = "\n      No files received. Direct posts to: " +
-                "\n      <br/>http://localhost:" + mEnvironment.getProperty("server.port") + "/{id)" +
-                "\n      <br/> where {id} is the unique url you want to test";
-    }
-    else
-    {
-      content = "\n      <p>" +
-                "\n        LAST FILE RECEIVED: " + aLastReceived.getFileName() +
-                "\n      </p>" +
-                "\n      <xmp>" +
-                "\n" +  aLastReceived.getContent() +
-                "\n      </xmp>";
-    }
-    return "<html>" +
-           "\n  <body>" +
-           "\n    <h1>/" + aTitle + "</h1>" +
-           content +
-           "\n  </body>" +
-           "\n</html>";
-  }
+//  @Deprecated
+//  private String getPageBody(String aTitle, DataReceived aLastReceived)
+//  {
+//    final String content;
+//    if (aLastReceived == null)
+//    {
+//      content = "\n      No files received. Direct posts to: " +
+//                "\n      <br/>http://localhost:" + mEnvironment.getProperty("server.port") + "/{id)" +
+//                "\n      <br/> where {id} is the unique url you want to test";
+//    }
+//    else
+//    {
+//      content = "\n      <p>" +
+//                "\n        LAST FILE RECEIVED: " + aLastReceived.getFileName() +
+//                "\n      </p>" +
+//                "\n      <xmp>" +
+//                "\n" +  aLastReceived.getContent() +
+//                "\n      </xmp>";
+//    }
+//    return "<html>" +
+//           "\n  <body>" +
+//           "\n    <h1>/" + aTitle + "</h1>" +
+//           content +
+//           "\n  </body>" +
+//           "\n</html>";
+//  }
 
 
 

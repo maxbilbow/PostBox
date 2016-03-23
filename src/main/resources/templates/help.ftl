@@ -1,7 +1,4 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9"><![endif]-->
-<!--[if IE 8]><html class="no-js lt-ie9"><![endif]-->
-<!--[if gt IE 8]><!--><html class="no-js"><!--<![endif]-->
 <head>
     <meta charset="utf-8">
 
@@ -12,7 +9,7 @@
     <!--Bootstrap-->
     <link rel="stylesheet" href="/css/lib/bootstrap.css">
     <link rel="stylesheet" href="/css/lib/bootstrap-responsive.css">
-    <link rel="stylesheet" href="/css/lib/toggle-switch.css">
+
     <title>${pageTitle!"?"}</title>
 
     <style>
@@ -34,7 +31,7 @@
             <p>Urls with content:</p>
             <ul>
         <#list urls as url>
-          <li><a href="/data/${url}">/${url}</a></li>
+          <li><a href="/${url}">/${url}</a></li>
         </#list>
             </ul>
         </div>
@@ -47,14 +44,8 @@
 </div>
 
 <div class="message-warn">
-  <span id="delete-all-data" class="btn btn-primary">DELETE ALL DATA</span>
+  <span id="delete-all-data" data-address="" class="btn btn-warning">DELETE ALL DATA</span>
 </div>
-<script>
-    $(document).ready(function () {
-       $("#delete-all-data").click(function () {
-           $.post("/DeleteAllData");
-       })
-    });
-</script>
+<script lang="text/javascript" src="/js/custom.js"></script>
 </body>
 </html>

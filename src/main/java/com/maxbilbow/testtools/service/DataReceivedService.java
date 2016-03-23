@@ -59,4 +59,12 @@ public class DataReceivedService
   {
     return mTransactionTemplate.execute(status -> mDataReceivedDao.findAll());
   }
+
+  @Transactional
+  public DataReceived delete(final Long aPk)
+  {
+    DataReceived data = mTransactionTemplate.execute(status -> mDataReceivedDao.findByPk(aPk));
+
+    return  mTransactionTemplate.execute(status -> mDataReceivedDao.makeTransient(data));
+  }
 }

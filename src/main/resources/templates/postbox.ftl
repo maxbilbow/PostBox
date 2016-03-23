@@ -5,23 +5,17 @@
 <head>
     <meta charset="utf-8">
 
-    <title>${pageTitle!"?"}</title>
-    <script type="text/javascript" src="/js/jquery-1.11.2.min.js"></script>
-    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/lib/bootstrap.js"></script>
 
 <#--Styles-->
     <!--Bootstrap-->
-    <link rel="stylesheet" href="/css/vendor/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/vendor/toggle-switch.css">
-    <style>
-        .data-received xmp {
-            background-color: black;
-            color: white;
-            max-height:600px;
-            overflow-y: scroll;
-        }
-    </style>
-    </head>
+    <link rel="stylesheet" href="/css/lib/bootstrap.css">
+    <link rel="stylesheet" href="/css/lib/bootstrap-responsive.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <title>${pageTitle!"?"}</title>
+
+</head>
 <body>
 <h1>/${pageTitle!"?"}</h1>
 
@@ -36,11 +30,11 @@
         <h4>${n+1} / ${dataList?size} Received</h4>
         <div>
 
-            <#if n != 0><a href="/data/${pageTitle}?n=${n-1}"></#if>
+            <#if n != 0><a href="/${pageTitle}?n=${n-1}"></#if>
             << last
             <#if n != 0></a></#if>
             ||
-            <#if dataList[n+1]?has_content><a href="/data/${pageTitle}?n=${n+1}"></#if>
+            <#if dataList[n+1]?has_content><a href="/${pageTitle}?n=${n+1}"></#if>
                     next >>
             <#if dataList[n+1]?has_content></a></#if>
         </div>
@@ -52,7 +46,10 @@
         </p>
         <xmp>${data.content}</xmp>
         </div>
-
+        <div class="message-warn">
+            <span id="delete-one" data-pk="${data.pk?c}" data-address="${pageTitle}" class="btn btn-warning">DELETE THIS ENTRY</span>
+            <span id="delete-all-data" class="btn btn-danger" data-address="${pageTitle}">DELETE ALL FOR PATH</span>
+        </div>
     <#else>
     <p>No files received. Direct posts to:
     <br/>http://localhost:${serverPort}/{id)"
@@ -60,5 +57,6 @@
     </p>
     </#if>
 </div>
+<script lang="text/javascript" src="/js/custom.js"></script>
 </body>
 </html>

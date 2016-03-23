@@ -1,7 +1,4 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9"><![endif]-->
-<!--[if IE 8]><html class="no-js lt-ie9"><![endif]-->
-<!--[if gt IE 8]><!--><html class="no-js"><!--<![endif]-->
 <head>
     <meta charset="utf-8">
 
@@ -44,15 +41,6 @@
     </#if>
 </div>
 
-<div class="message-warn">
-  <span id="delete-all-data" class="btn btn-primary">DELETE ALL DATA</span>
-</div>
-<script>
-    $(document).ready(function () {
-       $("#delete-all-data").click(function () {
-           $.post("/DeleteAllData");
-       })
-    });
-</script>
+
 </body>
 </html>
