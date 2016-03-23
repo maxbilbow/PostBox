@@ -7,16 +7,44 @@
 
     <title>${pageTitle!"?"}</title>
 
+    <style>
+        .data-received xmp {
+            background-color: black;
+            color: white;
+        }
+    </style>
     </head>
 <body>
 <h1>/${pageTitle!"?"}</h1>
-<h3>${dataList?size} Received</h3>
+
 <div id="data-received">
+
     <#if dataList?size != 0>
+        <#if RequestParameters.n?has_content>
+            <#assign n=RequestParameters.n?number>
+        <#else>
+            <#assign n=0>
+        </#if>
+        <h4>${n+1} / ${dataList?size} Received</h4>
+        <div>
+
+            <#if n != 0><a href="/${pageTitle}?n=${n-1}"></#if>
+            << last
+            <#if n != 0></a></#if>
+            ||
+            <#if dataList[n+1]?has_content><a href="/${pageTitle}?n=${n+1}"></#if>
+                    next >>
+            <#if dataList[n+1]?has_content></a></#if>
+        </div>
+        <#assign data=dataList[n]>
+        <div class="data-received">
         <p>
-            LAST FILE RECEIVED: ${dataList[0].fileName}
+            FILE RECEIVED: ${data.dateTime.toString("dd/MM/yyyy HH:mm")}
+            <br/>FILE NAME: ${data.fileName}
         </p>
-        <xmp>${dataList[0].content}</xmp>
+        <xmp>${data.content}</xmp>
+        </div>
+
     <#else>
     <p>No files received. Direct posts to:
     <br/>http://localhost:${serverPort}/{id)"
