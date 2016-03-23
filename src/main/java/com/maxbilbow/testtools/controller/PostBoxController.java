@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.*;
 
 /**
  * Created by bilbowm (Max Bilbow) on 09/03/2016.
@@ -115,6 +116,11 @@ public class PostBoxController// extends AbstractView
   @RequestMapping(value = "/{address}", method = RequestMethod.GET)
   public ModelAndView getModelAndView(@PathVariable("address") String aAddress)
   {
+    List dataList = mDataReceivedService.getDataWithAddress(aAddress);
+    if (dataList.isEmpty() || aAddress.equalsIgnoreCase("PostBoxHelp"))
+    {
+      return getHelp();
+    }
     return new ModelAndView("postbox")
             .addObject("dataList",mDataReceivedService.getDataWithAddress(aAddress))
             .addObject("pageTitle",aAddress)
@@ -122,9 +128,14 @@ public class PostBoxController// extends AbstractView
   }
 
   @RequestMapping(value = "/", method = RequestMethod.GET)
-  public ModelAndView get()
+  public ModelAndView getHelp()
   {
-    return getModelAndView("index");
+    Set<String> urls = new HashSet<>();
+    mDataReceivedService.findAll().forEach(aDataReceived -> urls.add(aDataReceived.getAddress()));
+    return new ModelAndView("help")
+            .addObject("urls", new ArrayList<>(urls))
+            .addObject("pageTitle","PostBoxHelp")
+            .addObject("serverPort",mEnvironment.getProperty("server.port"));
   }
 
   @Deprecated

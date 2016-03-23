@@ -54,4 +54,9 @@ public class DataReceivedService
   {
     return mTransactionTemplate.execute(status -> mDataReceivedDao.findWithAddress(aAddress));
   }
+
+  public List<DataReceived> findAll()
+  {
+    return mTransactionTemplate.execute(status -> mDataReceivedDao.findAll());
+  }
 }

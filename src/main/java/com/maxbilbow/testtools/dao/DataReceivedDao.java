@@ -24,7 +24,9 @@ public class DataReceivedDao extends GenericDao<DataReceived>
             .list();
   }
 
-//  public DataReceived makePersistent(final DataReceived aData)
+
+
+  //  public DataReceived makePersistent(final DataReceived aData)
 //  {
 //    return mLastFileReceived.put(aData.getAddress(),aData);
 //  }
