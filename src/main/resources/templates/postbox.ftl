@@ -11,6 +11,8 @@
         .data-received xmp {
             background-color: black;
             color: white;
+            max-height:600px;
+            overflow-y: scroll;
         }
     </style>
     </head>
