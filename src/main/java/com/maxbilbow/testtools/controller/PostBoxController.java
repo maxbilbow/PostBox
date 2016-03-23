@@ -18,7 +18,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by bilbowm (Max Bilbow) on 09/03/2016.
@@ -113,9 +116,13 @@ public class PostBoxController// extends AbstractView
     }
   }
 
-  @RequestMapping(value = "/{address}", method = RequestMethod.GET)
+  @RequestMapping(value = "/data/{address}", method = RequestMethod.GET)
   public ModelAndView getModelAndView(@PathVariable("address") String aAddress)
   {
+    if (aAddress == null || aAddress.isEmpty())
+    {
+      aAddress = "index";
+    }
     List dataList = mDataReceivedService.getDataWithAddress(aAddress);
     if (dataList.isEmpty() || aAddress.equalsIgnoreCase("PostBoxHelp"))
     {
@@ -127,7 +134,7 @@ public class PostBoxController// extends AbstractView
             .addObject("serverPort",mEnvironment.getProperty("server.port"));
   }
 
-  @RequestMapping(value = "/", method = RequestMethod.GET)
+  @RequestMapping(value = {"/","/data"}, method = RequestMethod.GET)
   public ModelAndView getHelp()
   {
     Set<String> urls = new HashSet<>();
@@ -137,6 +144,8 @@ public class PostBoxController// extends AbstractView
             .addObject("pageTitle","PostBoxHelp")
             .addObject("serverPort",mEnvironment.getProperty("server.port"));
   }
+
+
 
   @Deprecated
   private String getPageBody(String aTitle, DataReceived aLastReceived)
@@ -164,4 +173,7 @@ public class PostBoxController// extends AbstractView
            "\n  </body>" +
            "\n</html>";
   }
+
+
+
 }

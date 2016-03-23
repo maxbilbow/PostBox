@@ -25,7 +25,7 @@
     </style>
     </head>
 <body>
-<h1>/${pageTitle!"?"}</h1>
+<h1>/${pageTitle!"error"}</h1>
 
 <div id="help">
 
@@ -39,9 +39,7 @@
             </ul>
         </div>
     <#else>
-    <p>No files received. Direct posts to:
-    <br/>http://localhost:${serverPort}/{id)"
-       <br/> where {id} is the unique url you want to test";
+    <p>No files received. Try <a href="/">Post Box Help</a>
     </p>
     </#if>
 </div>
